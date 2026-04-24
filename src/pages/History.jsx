@@ -72,9 +72,9 @@ export default function History() {
     <div className="history-page">
       <Navbar />
 
-      <div className="history-layout" style={{ display: "flex", gap: "1.5rem", padding: "1.5rem" }}>
+      <div className="app-layout history-layout">
         <AsideNav />
-        <main style={{ flex: 1 }}>
+        <main className="content-main">
           <div className="page-header">
             <h2>📊 Stock History</h2>
           </div>

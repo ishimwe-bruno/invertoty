@@ -16,17 +16,30 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
+    const canSeeLowStock = user?.role === "admin" || user?.role === "staff";
+
     try {
-      const [allRes, lowRes, notifyRes] = await Promise.all([
+      const [allRes, lowRes, notifyRes] = await Promise.allSettled([
         productAPI.getAll(),
-        productAPI.getLowStock(),
-        notificationAPI.getNotifications(),
+        canSeeLowStock ? productAPI.getLowStock() : Promise.resolve({ data: [] }),
+        canSeeLowStock ? notificationAPI.getNotifications() : Promise.resolve({ data: [] }),
       ]);
 
-      const notifications = notifyRes.data || [];
+      const allProducts =
+        allRes.status === "fulfilled" ? allRes.value.data || [] : [];
+      const lowStockProducts =
+        lowRes.status === "fulfilled" ? lowRes.value.data || [] : [];
+      const derivedLowStockProducts = allProducts.filter(
+        (product) =>
+          Number(product?.quantity ?? 0) <=
+          Number(product?.minStock ?? product?.low_stock_threshold ?? 0)
+      );
+      const notifications =
+        notifyRes.status === "fulfilled" ? notifyRes.value.data || [] : [];
+
       setStats({
-        totalProducts: allRes.data.length,
-        lowStock: lowRes.data.length,
+        totalProducts: allProducts.length,
+        lowStock: canSeeLowStock ? lowStockProducts.length : derivedLowStockProducts.length,
         notifications: notifications,
       });
       setNotificationCount(notifications.length);
@@ -39,7 +52,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [user?.role]);
 
   if (loading) return <div className="loading">Loading...</div>;
 

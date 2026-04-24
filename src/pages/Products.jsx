@@ -19,8 +19,24 @@ export default function Products() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = filterLow ? await productAPI.getLowStock() : await productAPI.getAll();
-      setProducts(res.data || []);
+      if (filterLow) {
+        try {
+          const res = await productAPI.getLowStock();
+          setProducts(res.data || []);
+        } catch (err) {
+          const allRes = await productAPI.getAll();
+          const allProducts = allRes.data || [];
+          const filteredProducts = allProducts.filter(
+            (product) =>
+              Number(product?.quantity ?? 0) <=
+              Number(product?.minStock ?? product?.low_stock_threshold ?? 0)
+          );
+          setProducts(filteredProducts);
+        }
+      } else {
+        const res = await productAPI.getAll();
+        setProducts(res.data || []);
+      }
     } catch (err) {
       console.error("Error fetching products:", err);
       setProducts([]);
@@ -53,9 +69,9 @@ export default function Products() {
     <div className="products-page">
       <Navbar />
 
-      <div className="products-container" style={{ display: "flex", gap: "1.5rem", padding: "1.5rem" }}>
+      <div className="app-layout products-container">
         <AsideNav />
-        <main style={{ flex: 1 }}>
+        <main className="content-main">
           <div className="page-header">
             <h2>{filterLow ? "Low Stock Products" : "All Products"}</h2>
             {isAdmin && (
@@ -98,34 +114,38 @@ export default function Products() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => (
-                    <tr key={p.id} className={p.quantity <= p.minStock ? "low-stock-row" : ""}>
-                      <td>{p.name}</td>
-                      <td>{p.sku}</td>
-                      <td>
-                        {p.quantity}{" "}
-                        {p.quantity <= p.minStock && <span className="badge">Low</span>}
-                      </td>
-                      <td>{p.minStock}</td>
-                      <td>${p.price?.toFixed(2) || "0.00"}</td>
-                      {isAdmin && (
+                  {products.map((p) => {
+                    const threshold = p.minStock ?? p.low_stock_threshold ?? 0;
+
+                    return (
+                      <tr key={p.id} className={p.quantity <= threshold ? "low-stock-row" : ""}>
+                        <td>{p.name}</td>
+                        <td>{p.sku}</td>
                         <td>
-                          <button
-                            className="btn btn-sm"
-                            onClick={() => {
-                              setEditing(p);
-                              setShowForm(true);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
-                            Delete
-                          </button>
+                          {p.quantity}{" "}
+                          {p.quantity <= threshold && <span className="badge">Low</span>}
                         </td>
-                      )}
-                    </tr>
-                  ))}
+                        <td>{threshold}</td>
+                        <td>${p.price?.toFixed(2) || "0.00"}</td>
+                        {isAdmin && (
+                          <td>
+                            <button
+                              className="btn btn-sm"
+                              onClick={() => {
+                                setEditing(p);
+                                setShowForm(true);
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
+                              Delete
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                   {products.length === 0 && (
                     <tr>
                       <td colSpan={isAdmin ? 6 : 5} style={{ textAlign: "center", padding: "2rem" }}>

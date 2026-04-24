@@ -6,10 +6,23 @@ const api = axios.create({ baseURL: "/api" });
 
 const createMockResponse = (data) => ({ data });
 
-const normalizeProduct = (product) => ({
-  ...product,
-  low_stock_threshold: product?.minStock ?? product?.low_stock_threshold ?? 0,
-});
+const normalizeProduct = (product) => {
+  const minStock = Number(product?.minStock ?? product?.low_stock_threshold ?? 0);
+  const quantity = Number(product?.quantity ?? 0);
+  const price = Number(product?.price ?? 0);
+
+  return {
+    ...product,
+    minStock,
+    low_stock_threshold: minStock,
+    quantity,
+    price,
+  };
+};
+
+const isLowStockProduct = (product) =>
+  Number(product?.quantity ?? 0) <=
+  Number(product?.minStock ?? product?.low_stock_threshold ?? 0);
 
 const normalizeHistoryEntry = (entry) => ({
   ...entry,
@@ -31,8 +44,17 @@ const normalizeHistoryEntry = (entry) => ({
 });
 
 const buildLowStockNotifications = async () => {
-  const res = await api.get("/products/low-stock");
-  const products = (res.data || []).map(normalizeProduct);
+  let products = [];
+
+  try {
+    const res = await api.get("/products/low-stock");
+    products = (res.data || []).map(normalizeProduct);
+  } catch (err) {
+    const fallbackRes = await api.get("/products");
+    products = (fallbackRes.data || [])
+      .map(normalizeProduct)
+      .filter(isLowStockProduct);
+  }
 
   return {
     data: products.map((product) => ({

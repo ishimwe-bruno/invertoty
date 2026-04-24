@@ -64,13 +64,9 @@ export default function AsideNav() {
 
       {showNotifications && (
         <div className="sidebar-section notifications">
-          <h3>
-            Notifications ({notifications.length})
-            <button
-              className="btn-small"
-              onClick={() => setShowNotifications(false)}
-              style={{ float: "right" }}
-            >
+          <h3 className="sidebar-heading">
+            <span>Notifications ({notifications.length})</span>
+            <button className="btn-small" onClick={() => setShowNotifications(false)}>
               Hide
             </button>
           </h3>
@@ -97,13 +93,9 @@ export default function AsideNav() {
 
       {showHistory && user?.role === "admin" && (
         <div className="sidebar-section history">
-          <h3>
-            Recent History
-            <button
-              className="btn-small"
-              onClick={() => setShowHistory(false)}
-              style={{ float: "right" }}
-            >
+          <h3 className="sidebar-heading">
+            <span>Recent History</span>
+            <button className="btn-small" onClick={() => setShowHistory(false)}>
               Hide
             </button>
           </h3>

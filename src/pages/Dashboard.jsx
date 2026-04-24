@@ -11,13 +11,31 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([productAPI.getAll(), productAPI.getLowStock()])
+    const canSeeLowStock = user?.role === "admin" || user?.role === "staff";
+
+    Promise.allSettled([
+      productAPI.getAll(),
+      canSeeLowStock ? productAPI.getLowStock() : Promise.resolve({ data: [] }),
+    ])
       .then(([allRes, lowRes]) => {
-        setStats({ total: allRes.data.length, lowStock: lowRes.data.length });
+        const allProducts =
+          allRes.status === "fulfilled" ? allRes.value.data || [] : [];
+        const lowStockProducts =
+          lowRes.status === "fulfilled" ? lowRes.value.data || [] : [];
+        const derivedLowStockProducts = allProducts.filter(
+          (product) =>
+            Number(product?.quantity ?? 0) <=
+            Number(product?.minStock ?? product?.low_stock_threshold ?? 0)
+        );
+
+        setStats({
+          total: allProducts.length,
+          lowStock: canSeeLowStock ? lowStockProducts.length : derivedLowStockProducts.length,
+        });
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [user?.role]);
 
   const handleLogout = () => {
     logout();
@@ -36,9 +54,9 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="dashboard-container" style={{ display: "flex", gap: "1.5rem", padding: "1.5rem" }}>
+      <div className="app-layout dashboard-container">
         <AsideNav />
-        <main style={{ flex: 1 }}>
+        <main className="content-main">
           {loading ? (
             <div className="loading">Loading dashboard...</div>
           ) : (

@@ -36,9 +36,9 @@ export default function Users() {
     <div className="users-page">
       <Navbar />
 
-      <div className="users-container" style={{ display: "flex", gap: "1.5rem", padding: "1.5rem" }}>
+      <div className="app-layout users-container">
         <AsideNav />
-        <main style={{ flex: 1 }}>
+        <main className="content-main">
           <div className="page-header">
             <h2>👥 User Management</h2>
           </div>
