@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invertory Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="auth-body">
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <p class="eyebrow">Inventory Control</p>
+      <h1>Sign in to view your products.</h1>
+      <p class="subtle">Use one of the seeded accounts to open the product dashboard.</p>
+
+      <form id="login-form" class="stack">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="email" value="admin@invertory.com" required>
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="password" value="admin123" required>
+        </label>
+
+        <button type="submit" class="primary-btn">Login</button>
+      </form>
+
+      <p id="message" class="message" aria-live="polite"></p>
+
+      <div class="sample-box">
+        <strong>Sample accounts</strong>
+        <p>`admin@invertory.com` / `admin123`</p>
+        <p>`staff1@invertory.com` / `staff123`</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/login.js"></script>
+</body>
+</html>

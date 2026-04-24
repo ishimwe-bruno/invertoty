@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { sequelize } from './database/index.js';
 
 import authRoutes         from './routes/authRoutes.js';
@@ -16,9 +18,25 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 const DB_SYNC_FORCE = process.env.DB_SYNC_FORCE === 'true';
 const DB_SYNC_ON_START = process.env.DB_SYNC_ON_START === 'true';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, 'public');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(publicDir));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+app.get('/products', (req, res) => {
+  res.sendFile(path.join(publicDir, 'products.html'));
+});
+
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ ok: true });
+});
 
 // Public authentication routes
 app.use('/api/auth',     authRoutes);

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invertory Products</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="products-body">
+  <main class="page-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Product Dashboard</p>
+        <h1>Inventory products</h1>
+        <p id="welcome-text" class="subtle"></p>
+      </div>
+      <div class="toolbar">
+        <button id="refresh-btn" class="secondary-btn" type="button">Refresh</button>
+        <button id="logout-btn" class="primary-btn" type="button">Logout</button>
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <article class="summary-card">
+        <span>Total products</span>
+        <strong id="total-products">0</strong>
+      </article>
+      <article class="summary-card">
+        <span>Low stock items</span>
+        <strong id="low-stock-count">0</strong>
+      </article>
+    </section>
+
+    <p id="products-message" class="message" aria-live="polite"></p>
+    <section id="products-grid" class="products-grid"></section>
+  </main>
+
+  <script src="/products.js"></script>
+</body>
+</html>
